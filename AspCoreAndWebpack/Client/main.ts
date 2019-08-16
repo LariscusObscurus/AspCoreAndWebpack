@@ -1,4 +1,5 @@
 ﻿import './styles/site.scss';
+import 'core-js'
 import 'jquery'
 
 console.log("Hello world.");

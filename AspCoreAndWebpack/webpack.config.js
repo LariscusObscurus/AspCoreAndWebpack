@@ -1,23 +1,27 @@
-/// <binding ProjectOpened='Watch - Development' />
+/// <binding ProjectOpened="Watch - Development" />
 const path = require("path");
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// Copy assets into wwwroot
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const postcssPresetEnv = require("postcss-preset-env");
+//Cleans our wwwroot directory before building
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const webpack = require('webpack');
-// We are getting 'process.env.NODE_ENV' from the NPM scripts
-// Remember the 'dev' script?
+// Used to automatically add bundles to the _Layout.cshtml by using a template
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+// We are getting "process.env.NODE_ENV" from the NPM scripts
+// Remember the "dev" script?
 const devMode = process.env.NODE_ENV !== "production";
 module.exports = {
     // Tells Webpack which built-in optimizations to use
-    // If you leave this out, Webpack will default to 'production'
+    // If you leave this out, Webpack will default to "production"
     mode: devMode ? "development" : "production",
     // Webpack needs to know where to start the bundling process,
-    // so we define the Sass file under './Styles' directory
+    // so we define the Sass file under "./Styles" directory
     entry: {
-        //style: "./Client/styles/site.scss",
         app: "./Client/main.ts",
-        polyfill: "core-js"
+        //style: "./Client/styles/site.scss",
+        //polyfill: "core-js",
     },
     // This is where we define the path where Webpack will place
     // a bundled JS file. Webpack needs to produce this file,
@@ -26,11 +30,16 @@ module.exports = {
         path: path.resolve(__dirname, "wwwroot"),
         // Specify the base path for all the styles within your
         // application. This is relative to the output path, so in
-        // our case it will be './wwwroot/css'
-        publicPath: "/css",
+        // our case it will be "./wwwroot/css"
+        publicPath: "/",
         // The name of the output bundle. Path is also relative
-        // to the output path, so './wwwroot/js'
+        // to the output path, so "./wwwroot/js"
         filename: "js/[name].bundle.js"
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all'
+        }
     },
     devtool: "source-map",
     resolve: {
@@ -58,7 +67,7 @@ module.exports = {
                 use: [
                     {
                         // Extracts the CSS into a separate file and uses the
-                        // defined configurations in the 'plugins' section
+                        // defined configurations in the "plugins" section
                         loader: MiniCssExtractPlugin.loader
                     },
                     {
@@ -75,7 +84,7 @@ module.exports = {
                         options: {
                             ident: "postcss",
                             // We instruct PostCSS to autoprefix and minimize our
-                            // CSS when in production mode, otherwise don't do
+                            // CSS when in production mode, otherwise don"t do
                             // anything.
                             plugins: devMode
                                 ? () => []
@@ -113,13 +122,8 @@ module.exports = {
                             name: "[name].[ext]",
                             // Indicates where the images are stored and will use
                             // this path when generating the CSS files.
-                            // Example, in site.scss I have
-                            // url('../wwwroot/images/pattern.png') and when generating
-                            // the CSS file, file-loader will output as
-                            // url(../images/pattern.png), which is relative
-                            // to '/css/site.css'
-                            publicPath: "../images",
-                            // When this option is 'true', the loader will emit the
+                            publicPath: "../assets",
+                            // When this option is "true", the loader will emit the
                             // image to output.path
                             emitFile: false
                         }
@@ -129,7 +133,7 @@ module.exports = {
         ]
     },
     plugins: [
-        // Configuration options for MiniCssExtractPlugin. Here I'm only
+        // Configuration options for MiniCssExtractPlugin. Here I"m only
         // indicating what the CSS output file name should be and
         // the location
         new webpack.ProvidePlugin({
@@ -139,10 +143,14 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin([
-            { from: './Client/assets/*.*', to: 'assets/', flatten: true }
+            { from: "./Client/assets/*.*", to: "assets/", flatten: true }
         ]),
         new MiniCssExtractPlugin({
             filename: "css/site.css" 
         }),
+        new HtmlWebpackPlugin({
+            filename: "../Pages/Shared/_Layout.cshtml",
+            template: "Client/_Layout_Template.cshtml"
+        })
     ]
 };
