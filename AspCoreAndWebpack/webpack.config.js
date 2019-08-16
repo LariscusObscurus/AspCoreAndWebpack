@@ -16,7 +16,8 @@ module.exports = {
     // so we define the Sass file under './Styles' directory
     entry: {
         //style: "./Client/styles/site.scss",
-        app: "./Client/main.ts"
+        app: "./Client/main.ts",
+        polyfill: "core-js"
     },
     // This is where we define the path where Webpack will place
     // a bundled JS file. Webpack needs to produce this file,
